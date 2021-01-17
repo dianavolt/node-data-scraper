@@ -1,5 +1,12 @@
 const puppeteer = require('puppeteer')
 const cheerio = require('cheerio')
+const mongoose = require('mongoose')
+const Listing = require('./models/Listing')
+
+async function connectToMongoDb() {
+    await mongoose.connect(mongoLogin, { useNewUrlParser: true })
+    console.log('==> Connection to MongoDB made!')
+}
 
 async function scrapeListings(page) {
     await page.goto('https://vancouver.craigslist.org/d/apartments-housing-for-rent/search/apa')
@@ -37,6 +44,9 @@ async function scrapeListingDesc(listings, page) {
         listings[i].description = description
         console.log(listings[i].description)
 
+        const listingModel = new Listing(listings[i])
+        await listingModel.save()
+
         // prevent page blocking
         await sleep(1000).catch(e => console.log('Interruption exception: ', e))
     }
@@ -47,6 +57,7 @@ async function sleep(miliseconds) {
 }
 
 async function main() {
+    await connectToMongoDb()
     const browser = await puppeteer.launch({headless: false}) // disable browser hiding
     const page = await browser.newPage()
     const listings = await scrapeListings(page)

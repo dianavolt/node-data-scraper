@@ -19,6 +19,7 @@
   "homepage": "https://github.com/dianavolt/node-data-scraper#readme",
   "dependencies": {
     "cheerio": "^1.0.0-rc.5",
+    "mongoose": "^5.11.12",
     "puppeteer": "^5.5.0",
     "request": "^2.88.2",
     "request-promise": "^4.2.6"
