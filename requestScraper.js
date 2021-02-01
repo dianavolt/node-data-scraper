@@ -21,13 +21,43 @@ async function scrapeList() {
             const resultTitle = $(element).children('.result-title')
             const title = resultTitle.text()
             const url = resultTitle.attr('href')
-            const result = { title, url }
+            const postedDate = new Date($(element)
+                .children('time')
+                .attr('datetime'))
+            const area = $(element).find('.result-hood').text()
+
+            const result = { title, url, postedDate, area }
             resultList.push(result)
         })
-        console.log(resultList)
+        console.log(result)
+        return resultList
     } catch (e) {
         console.error(e)
     }
 }
 
-scrapeList()
+async function scrapeDescription(postingsWithHeaders) {
+    return await Promise.all(
+        postingsWithHeaders.map(async post => {
+            try {
+                const htmlResult = await request.get(post.url)
+                const $ = await cheerio.load(htmlResult)
+                $('.print-qrcode-container').remove()
+                post.description = $('#postingbody').text()
+                post.address = $('div.mapaddress').text()
+                const priceText = $('.attrgroup').children().first().text()
+                post.price = priceText.replace('price: ', '')
+                return post
+            } catch {
+                console.error(error)
+            }
+        })
+    )
+}
+async function srapeWeb() {
+    const postingsWithHeaders = await scrapeList()
+    const postingDescription = await scrapeDescription(postingsWithHeaders)
+    console.log(postingDescription.length)
+}
+
+srapeWeb()
