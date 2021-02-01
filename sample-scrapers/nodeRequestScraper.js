@@ -48,8 +48,8 @@ async function scrapeDescription(postingsWithHeaders) {
                 const priceText = $('.attrgroup').children().first().text()
                 post.price = priceText.replace('price: ', '')
                 return post
-            } catch {
-                console.error(error)
+            } catch (e) {
+                console.error(e)
             }
         })
     )
